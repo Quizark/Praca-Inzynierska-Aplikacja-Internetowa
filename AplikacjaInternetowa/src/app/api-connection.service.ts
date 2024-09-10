@@ -89,49 +89,61 @@ export class ApiConnectionService {
     return throwError(() => new Error(error?.message || 'Something went wrong'));
   }
 
-  // Create a new report
   addNewReport(reportData: {
-    needPhotosDamage: boolean;
-    needPhotosDevice: boolean;
-    isCodeAssigned: boolean;
-    clientEmail: string;
+    email: string;           // email w reportData
     deviceWork: string;
     deviceComplete: string;
     visibleDamage: string;
     codeNumber: string;
     description: string;
-    formatDate: (date: Date) => string; // formatDate to funkcja, która przyjmuje datę i zwraca string
-    userEmail: string;
-  }, sessionToken: string) {
+    employee: string;        // userEmail w reportData
+  },isCodeAssigned: boolean, sessionToken: string) {
+    console.log("Still working! Ostatni");
     const now = new Date();
-    const formattedDate = reportData.formatDate(now); // Wywołanie funkcji formatDate
+    const formattedDate = this.formatDate(now); // Wywołanie funkcji formatDate w serwisie
+
     const reportDataWithDate = {
       ...reportData,
       date: formattedDate,  // Przypisanie sformatowanej daty do pola date
     };
 
     let link = `${this.baseUrl}/devices/create`;
-    if (!reportData.isCodeAssigned) {
+    console.log("isCodeAssigned should be true/false: ", isCodeAssigned);
+    if (!isCodeAssigned) {
       link = `${this.baseUrl}/devices/createNew`;
+      console.log("isCodeAssigned should be false: ", isCodeAssigned);
     }
 
     const headers = new HttpHeaders({
       'Content-Type': 'application/json',
       'Authorization': sessionToken,
     });
-
+    console.log("Sending data: ", reportDataWithDate);
+    console.log("Sending link: ", link);
     return this.http.post(link, reportDataWithDate, { headers }).pipe(
       catchError(this.handleError)
     );
   }
 
-  // Fetch emails
-  fetchEmails(sessionToken: string) {
+  private formatDate(date: Date): string {
+    const year = date.getFullYear();
+    const month = (date.getMonth() + 1).toString().padStart(2, '0');
+    const day = date.getDate().toString().padStart(2, '0');
+    const hours = date.getHours().toString().padStart(2, '0');
+    const minutes = date.getMinutes().toString().padStart(2, '0');
+    const seconds = date.getSeconds().toString().padStart(2, '0');
+    
+    return `${hours}:${minutes} ${day}-${month}-${year}`;
+  }
+
+
+  fetchEmails(sessionToken: string): Observable<string[]> {
     const headers = new HttpHeaders({
       'Authorization': sessionToken,
     });
-
-    return this.http.get(`${this.baseUrl}/persons/emails`, { headers }).pipe(
+  
+    return this.http.get<string[]>(`${this.baseUrl}/persons/emails`, { headers }).pipe(
+      tap(response => console.log('Odpowiedź z API: ', response)), // Dodaj logowanie odpowiedzi //DO USUNIECIA WYWOŁANIE W KONSOLI
       catchError(this.handleError)
     );
   }
