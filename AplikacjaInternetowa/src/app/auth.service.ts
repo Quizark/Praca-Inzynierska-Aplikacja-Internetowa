@@ -1,28 +1,30 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { Observable, throwError } from 'rxjs';
-import { catchError } from 'rxjs/operators';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { Observable, of } from 'rxjs';
+import { catchError, map, switchMap } from 'rxjs/operators';
+import { UserService } from './user-service.service'; // Dodaj właściwą ścieżkę
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
 
-  private apiUrl = 'http://localhost:8080/users/login';
+  private apiUrl = 'http://localhost:8080'; // Zamień na swój URL API
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient, private userService: UserService) {}
 
-  login(email: string, password: string): Observable<any> {
-    const loginData = { email, password };
-    return this.http.post<any>(this.apiUrl, loginData).pipe(
-      catchError(this.handleError)
+  checkToken(): Observable<boolean> {
+    return this.userService.sessionToken$.pipe(
+      switchMap(token => {
+        if (!token) {
+          return of(false); // Jeśli token nie istnieje, zwróć od razu false
+        }
+        const headers = new HttpHeaders().set('Authorization', `${token}`);
+        return this.http.get<{ message: string }>(`${this.apiUrl}/users/verify`, { headers }).pipe(
+          map(response => response.message === 'Session is valid'),
+          catchError(() => of(false)) // Jeśli wystąpi błąd, uznajemy token za nieważny
+        );
+      })
     );
-  }
-
-  private handleError(error: any) {
-    console.error('An error occurred:', error);
-    console.error('Error status:', error.status);
-    console.error('Error message:', error.message);
-    return throwError(() => new Error('Failed to connect to the server'));
   }
 }

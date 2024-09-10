@@ -25,6 +25,7 @@ export class UserService {
 
   setSessionToken(token: string | null): void {
     this.sessionTokenSubject.next(token);
+    localStorage.setItem('authToken', token || '');
     this.checkAdminStatus(this.userEmailSubject.value, token);
   }
 

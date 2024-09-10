@@ -4,6 +4,7 @@ import { Router } from '@angular/router';
 import { AuthService } from '../auth.service';  // Upewnij się, że ścieżka jest poprawna
 import { UserService } from '../user-service.service';  // Upewnij się, że ścieżka jest poprawna
 import { MatSnackBar } from '@angular/material/snack-bar';  // Użyj Angular Material do powiadomień
+import { ApiConnectionService } from '../api-connection.service';
 
 @Component({
   selector: 'app-login-screen',
@@ -21,7 +22,8 @@ export class LoginScreenComponent implements OnInit {
     private router: Router,
     private authService: AuthService,
     private userService: UserService,
-    private snackBar: MatSnackBar
+    private snackBar: MatSnackBar,
+    private apiConnection: ApiConnectionService,
   ) {
     this.loginForm = this.fb.group({
       email: ['', [Validators.required, Validators.email]],
@@ -35,13 +37,25 @@ export class LoginScreenComponent implements OnInit {
     if (this.loginForm.valid) {
       const { email, password } = this.loginForm.value;
       console.log('Login Data:', { email, password }); // Dodaj logowanie
-      this.authService.login(email, password).subscribe({
+      this.apiConnection.login(email, password).subscribe({
         next: (response) => {
           console.log('Login Response:', response); // Dodaj logowanie
           this.userService.setUserEmail(email);
           this.userService.setSessionToken(response.sessionToken);
+  
+          // Dodaj logowanie, aby sprawdzić, czy token jest prawidłowo ustawiany
+          console.log('Token set in UserService: ', this.userService.sessionToken$);
+  
           this.snackBar.open('Login successful', 'Close', { duration: 3000 });
-          this.router.navigate(['/home']); // Lub inna strona po zalogowaniu
+  
+          // Sprawdź, czy router jest prawidłowo używany
+          this.router.navigate(['/home']).then(success => {
+            if (success) {
+              console.log('Navigation to /home successful');
+            } else {
+              console.error('Navigation to /home failed');
+            }
+          });
         },
         error: (error) => {
           console.error('Login Error:', error); // Dodaj logowanie
