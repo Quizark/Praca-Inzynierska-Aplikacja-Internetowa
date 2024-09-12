@@ -46,7 +46,8 @@ export class AddreportphotosscreenComponent implements OnInit, OnDestroy {
   }
 
   handleSubmit(): void {
-    const deviceCode = this.reportData.Device?.codeNumber; // Replace with actual code
+    console.log("this.reportData: ",this.reportData);
+    const deviceCode = this.reportData.Device?.id; // Replace with actual code
 
     this.sessionTokenSubscription = this.userService.sessionToken$.pipe(take(1)).subscribe((sessionToken) => {
       console.log('Session Token: ', sessionToken);

@@ -70,7 +70,7 @@ export class WorkprogressscreenComponent implements OnInit{
     try {
       const result = await this.apiConnectionService.searchCodesByEmail(email, sessionToken).toPromise();
       // Jeśli operacja zakończyła się sukcesem
-      alert('Search completed successfully!');
+      alert('Search completed successfully!\nCode numbers: '+result);
       console.log('Result:', result);
     } catch (error) {
       // Obsłuż przypadek błędu

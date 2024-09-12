@@ -1,45 +1,44 @@
 <div class="container">
-    <div class="background-image">
-      <div class="scroll-container">
-        <h1 class="header">Device Details</h1>
-        <div class="device-scroll-container">
-          <!-- Renderowanie informacji o urządzeniu -->
-          <ng-container *ngIf="deviceDetails.length; else noInfo">
-            <div *ngFor="let detail of deviceDetails" class="task-container">
-              <p class="text-device">Employee: {{ detail.employee }}</p>
-              <p class="text-device">Date: {{ detail.date }}</p>
-              <p class="text-device">Description: {{ detail.description }}</p>
-            </div>
-          </ng-container>
-          <ng-template #noInfo>
-            <p class="no-info-text">Brak informacji</p>
-          </ng-template>
-        </div>
-  
-        <!-- Renderowanie zdjęć -->
-        <div *ngIf="showPhotos" class="image-container">
-          <p *ngIf="loading">Loading photos...</p>
-          <ng-container *ngIf="!loading">
-            <ng-container *ngIf="photos.length; else noPhotos">
-              <div *ngFor="let photoUrl of photos">
-                <img [src]="photoUrl" (click)="viewFullScreen(photoUrl)" class="image" />
-              </div>
-            </ng-container>
-            <ng-template #noPhotos>
-              <p class="text-device">No photos for this device</p>
-            </ng-template>
-          </ng-container>
-        </div>
+  <div class="background-image">
+    <div class="scroll-container">
+      <!-- Warunkowe renderowanie zdjęcia -->
+      <h1 *ngIf="!showPhotos" class="header">Device Details</h1>
+      <div *ngIf="showPhotos"  class="image-container">
+        <img *ngFor="let photo of photos" [src]="photo" alt="Device Photo" class="image" />
       </div>
-  
-      <div class="button-container">
-        <button class="button" (click)="refresh()">Refresh</button>
-        <button class="button" (click)="togglePhotos()">
-          {{ showPhotos ? "Hide Photos" : "Show Photos" }}
-        </button>
-        <button class="button" (click)="navigateToUpdate()">Update</button>
-        <button class="button" (click)="goBack()">Back</button>
+      <div class="device-scroll-container">
+        <!-- Renderowanie informacji o urządzeniu -->
+        <ng-container *ngIf="deviceDetails.length; else noInfo">
+          <div *ngFor="let detail of deviceDetails" class="task-container">
+            <p class="text-device">Employee: {{ detail.employee }}</p>
+            <p class="text-device">Date: {{ detail.date }}</p>
+            <p class="text-device">Description: {{ detail.description }}</p>
+          </div>
+        </ng-container>
+        <ng-template #noInfo>
+          <p class="no-info-text">Brak informacji</p>
+        </ng-template>
       </div>
     </div>
+    <!-- Renderowanie zdjęć
+    <div *ngIf="showPhotos" class="image-container">
+      <p *ngIf="loading">Loading photos...</p>
+      <ng-container *ngIf="!loading">
+        <ng-container *ngIf="photos.length; else noPhotos">
+          <img *ngFor="let photo of photos" [src]="photo" alt="Device Photo" class="image" />
+        </ng-container>
+        <ng-template #noPhotos>
+          <p class="text-device">No photos for this device</p>
+        </ng-template>
+      </ng-container>
+    </div> -->
+    <div class="button-container">
+      <button class="button" (click)="refresh()">Refresh</button>
+      <button class="button" (click)="togglePhotos()">
+        {{ showPhotos ? "Hide Photos" : "Show Photos" }}
+      </button>
+      <button class="button" (click)="navigateToUpdate()">Update</button>
+      <button class="button" (click)="goBack()">Back</button>
+    </div>
   </div>
-  
+</div>

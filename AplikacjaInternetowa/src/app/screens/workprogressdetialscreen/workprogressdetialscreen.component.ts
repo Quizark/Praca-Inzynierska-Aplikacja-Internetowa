@@ -2,12 +2,14 @@ import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
+import { ApiConnectionService } from '../../services/api-connection.service';
+import { UserService } from '../../services/user-service.service';
 
 @Component({
   selector: 'app-work-progress-detail-screen',
   templateUrl: './workprogressdetialscreen.component.html',
   styleUrls: ['./workprogressdetialscreen.component.css'],
-  standalone:true,
+  standalone: true,
   imports: [ReactiveFormsModule, CommonModule]
 })
 export class WorkprogressdetialscreenComponent implements OnInit {
@@ -18,7 +20,9 @@ export class WorkprogressdetialscreenComponent implements OnInit {
   constructor(
     private route: ActivatedRoute,
     private router: Router,
-    private fb: FormBuilder
+    private fb: FormBuilder,
+    private apiService: ApiConnectionService,
+    private userService: UserService,
   ) {
     this.clientForm = this.fb.group({
       clientName: [''],
@@ -29,9 +33,25 @@ export class WorkprogressdetialscreenComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    //Pobieranie danych z poprzedniego ekranu!
+    const sessionToken = this.userService.getSessionToken();
+
     this.deviceData = history.state.device;
     console.log('Received device data:', this.deviceData);
+    if (sessionToken === null) {
+      console.error('Session token is null');
+      return;
+    }
+    //Pobieranie danych o kliencie
+    this.apiService.fetchPersonDataByEmail(this.deviceData[0]?.email, sessionToken).subscribe(
+      (data: any) => {
+        this.personData = data;
+        console.log("personData", this.personData);
+        this.updateForm();
+      },
+      (error) => {
+        console.error('Error fetching person data:', error);
+      }
+    );
   }
 
   updateForm(): void {
@@ -48,6 +68,6 @@ export class WorkprogressdetialscreenComponent implements OnInit {
   }
 
   goBack(): void {
-    this.router.navigate(['..']);
+    window.history.back();
   }
 }

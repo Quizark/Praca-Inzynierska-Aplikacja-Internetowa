@@ -1,5 +1,10 @@
 <div class="container">
-    <div class="background-image">
+  <div class="background-image">
+    <form [formGroup]="searchForm" (ngSubmit)="handleSearch()">
+      <input formControlName="searchQuery" placeholder="Search clients..." class="input" />
+    </form>
+
+    <div class="scroll-container">
       <div *ngIf="loading" class="loading-text">Loading employees...</div>
       <div *ngIf="!loading" class="employee-list">
         <div *ngFor="let employee of employees" class="employee-card">
@@ -10,8 +15,8 @@
           <button class="button" (click)="editEmployee(employee)">Edit</button>
         </div>
       </div>
-      <button class="button" (click)="fetchEmployees()">Refresh</button>
-      <button class="button" (click)="goBack()">Back</button>
     </div>
+    <button class="button" (click)="fetchEmployees()">Refresh</button>
+    <button class="button" (click)="goBack()">Back</button>
   </div>
-  
+</div>

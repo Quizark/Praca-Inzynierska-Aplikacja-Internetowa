@@ -8,13 +8,14 @@ import { MatInputModule } from '@angular/material/input';
 import { UserService } from '../../services/user-service.service';
 import { Employee } from '../../interfaces/Employee.interface';
 import { Device } from '../../interfaces/Device.interface';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-add-new-task',
   templateUrl: './addnewtaskscreen.component.html',
   styleUrls: ['./addnewtaskscreen.component.css'],
   standalone: true,
-  imports: [ReactiveFormsModule, MatFormFieldModule, MatSelectModule, MatInputModule]
+  imports: [ReactiveFormsModule, CommonModule, MatFormFieldModule, MatSelectModule, MatInputModule]
 })
 export class AddnewtaskscreenComponent implements OnInit {
   taskForm: FormGroup;
@@ -83,12 +84,13 @@ export class AddnewtaskscreenComponent implements OnInit {
     };
 
     this.apiService.handleTaskSubmit(this.sessionToken, employee.email, device.codeNumber, formData.taskDescription, ).subscribe({
-      next: () => this.router.navigate(['/tasks']),
+      next: () => window.history.back(),
       error: err => console.error('Error submitting task:', err)
     });
+    alert("Task set")
   }
 
   goBack(): void {
-    this.router.navigate(['/previous-route']); // Adjust the route as needed
+    window.history.back();
   }
 }

@@ -2,10 +2,10 @@
     <div class="background-image">
         <form [formGroup]="clientForm" (ngSubmit)="handleSave()">
             <div class="text-input-container">
-                <input formControlName="clientName" placeholder="Name" class="input" />
-                <input formControlName="clientSurname" placeholder="Surname" class="input" />
-                <input formControlName="clientEmail" type="email" placeholder="Email" class="input" />
-                <input formControlName="clientPhone" type="tel" placeholder="Phone Number" class="input" />
+                <input formControlName="name" placeholder="Name" class="input" />
+                <input formControlName="surname" placeholder="Surname" class="input" />
+                <input formControlName="email" type="email" placeholder="Email" class="input" />
+                <input formControlName="phone" type="tel" placeholder="Phone Number" class="input" />
             </div>
             <div class="button-container-with-text">
                 <button type="submit" class="green-button">Save</button>

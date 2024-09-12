@@ -1,54 +1,92 @@
-import { Component, OnInit } from '@angular/core';
-import { Router } from '@angular/router';
-import { UserService } from '../../services/user-service.service';
+import { Component, OnInit, OnDestroy } from '@angular/core';
+import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
+import { Subscription } from 'rxjs';
 import { ApiConnectionService } from '../../services/api-connection.service';
+import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
-import { ReactiveFormsModule } from '@angular/forms';
+import { UserService } from '../../services/user-service.service';
+import { Employee } from '../../interfaces/Employee.interface';
 
 @Component({
   selector: 'app-all-employee-screen',
+  standalone: true,
   templateUrl: './allemployeescreen.component.html',
   styleUrls: ['./allemployeescreen.component.css'],
-  standalone: true,
-  imports: [CommonModule, ReactiveFormsModule]
+  imports: [ReactiveFormsModule, CommonModule],
 })
-export class AllemployeescreenComponent implements OnInit {
+export class AllemployeescreenComponent implements OnInit, OnDestroy {
+  searchForm: FormGroup;
   employees: any[] = [];
+  filteredEmployees: any[] = [];
   loading = true;
+  private subscriptions: Subscription = new Subscription();
 
-  constructor(private userService: UserService, private apiConnectionService: ApiConnectionService, private router: Router) {}
+  constructor(
+    private fb: FormBuilder,
+    private apiConnectionService: ApiConnectionService,
+    private router: Router,
+    private userService: UserService,
+  ) {
+    this.searchForm = this.fb.group({
+      searchQuery: ['']
+    });
+  }
 
   ngOnInit(): void {
     this.fetchEmployees();
+    this.subscriptions.add(
+      this.searchForm.get('searchQuery')!.valueChanges.subscribe(query => {
+        this.filteredEmployees = this.filterEmployees(query);
+      })
+    );
+  }
+
+  ngOnDestroy(): void {
+    this.subscriptions.unsubscribe();
   }
 
   fetchEmployees(): void {
-    this.loading = true;
-    const sessionToken = this.userService.getSessionToken(); 
-  
-    // Check if sessionToken is null or undefined
-    if (sessionToken) {
-      this.apiConnectionService.fetchEmployees(sessionToken).subscribe(
-        (data: any[]) => {
-          this.employees = data;
-          this.loading = false;
-        },
-        error => {
-          console.error('Error fetching employees', error);
-          this.loading = false;
-        }
-      );
-    } else {
-      console.error('Session token is not available.');
-      this.loading = false;
+    const sessionToken = this.userService.getSessionToken();
+    if (sessionToken === null) {
+      console.error('Session token is null or UserEmail is null');
+      return;
     }
+    this.apiConnectionService.fetchEmployees(sessionToken).subscribe({
+      next: (employees: Employee[]) => {
+        this.employees = employees;
+        this.filteredEmployees = this.filterEmployees(this.searchForm.get('searchQuery')!.value);
+        this.loading = false;
+      },
+      error: () => {
+        this.loading = false;
+      }
+    });
+  }
+
+  filterEmployees(query: string): any[] {
+    const lowerQuery = query.toLowerCase();
+    return this.employees.filter(employee =>
+      employee.name.toLowerCase().includes(lowerQuery) ||
+      employee.surname.toLowerCase().includes(lowerQuery) ||
+      employee.email.toLowerCase().includes(lowerQuery)
+    );
+  }
+
+  handleSearch(): void {
+    // Handle search form submission if needed
+  }
+
+  refreshEmployees(): void {
+    this.loading = true;
+    this.fetchEmployees();
   }
 
   editEmployee(employee: any): void {
-    this.router.navigate(['/edit-employee'], { state: { employee } });
+    //console.log("state: { employee }", {state: { employee }})
+    this.router.navigate(['/Editemployeescreen'], { state: { employee } });
   }
 
   goBack(): void {
-    this.router.navigate(['/']);
+    window.history.back();
   }
 }

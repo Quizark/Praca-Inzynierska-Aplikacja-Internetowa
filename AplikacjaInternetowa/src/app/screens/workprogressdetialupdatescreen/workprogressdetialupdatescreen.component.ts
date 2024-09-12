@@ -15,8 +15,7 @@ import { CommonModule } from '@angular/common';
 export class WorkprogressdetialupdatescreenComponent implements OnInit {
   updateForm: FormGroup;
   deviceId!: string;
-  sessionToken!: string;
-  userEmail!: string;
+  
 
   constructor(
     private fb: FormBuilder,
@@ -32,23 +31,26 @@ export class WorkprogressdetialupdatescreenComponent implements OnInit {
 
   ngOnInit(): void {
     this.deviceId = this.route.snapshot.paramMap.get('deviceId') || '';
-    const sessionToken = this.userService.getSessionToken();
-    const userEmail = this.userService.getUserEmail();
     this.updateForm.patchValue({ description: '' });
   }
 
   handleSubmit(): void {
     const description = this.updateForm.get('description')?.value;
-    const employee = this.userEmail || '';
-
-    this.apiService.updateDevice(this.sessionToken, this.deviceId, description, employee)
+    const sessionToken = this.userService.getSessionToken();
+    const userEmail = this.userService.getUserEmail();
+    if (sessionToken === null || userEmail  === null ) {
+      console.error('Session token is null or UserEmail is null');
+      return;
+    }
+    this.apiService.updateDevice(sessionToken, this.deviceId, description, userEmail)
       .subscribe({
-        next: () => this.router.navigate(['/home']),
+        next: () => window.history.back(),
         error: (error) => console.error('Error:', error)
       });
+      alert("Udane wrzucenie aktualizacji");
   }
 
   goBack(): void {
-    this.router.navigate(['/previous-page']);
+    window.history.back();
   }
 }

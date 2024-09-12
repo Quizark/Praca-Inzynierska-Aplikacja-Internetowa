@@ -18,7 +18,7 @@ export class AllclientscreenComponent implements OnInit, OnDestroy {
   clients: Clients[] = [];
   filteredClients: any[] = [];
   loading = true;
-  sessionToken: string = '';
+ 
   private subscriptions: Subscription = new Subscription();
 
   constructor(
@@ -33,6 +33,7 @@ export class AllclientscreenComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
+    
     this.fetchClients();
     this.subscriptions.add(
       this.searchForm.get('searchQuery')!.valueChanges.subscribe(query => {
@@ -40,10 +41,7 @@ export class AllclientscreenComponent implements OnInit, OnDestroy {
       })
     );
 
-    this.userService.sessionToken$.subscribe(token => {
-      this.sessionToken = token || '';
-    });
-
+    
   }
 
   ngOnDestroy(): void {
@@ -51,7 +49,12 @@ export class AllclientscreenComponent implements OnInit, OnDestroy {
   }
 
   fetchClients(): void {
-    this.apiConnectionService.fetchClients(this.sessionToken).subscribe({
+    const sessionToken = this.userService.getSessionToken();
+    if (sessionToken === null ) {
+      console.error('Session token is null or UserEmail is null');
+      return;
+    }
+    this.apiConnectionService.fetchClients(sessionToken).subscribe({
       next: (clients: Clients[]) => { // Correctly typing the response here
         this.clients = clients;
         this.filteredClients = this.filterClients(this.searchForm.get('searchQuery')!.value);
@@ -83,10 +86,10 @@ export class AllclientscreenComponent implements OnInit, OnDestroy {
   }
 
   editClient(client: any): void {
-    this.router.navigate(['/edit-client', { client: JSON.stringify(client) }]);
+    this.router.navigate(['/Editclientscreen'], {state: {client}});
   }
 
   goBack(): void {
-    this.router.navigate(['..']);
+    window.history.back();
   }
 }

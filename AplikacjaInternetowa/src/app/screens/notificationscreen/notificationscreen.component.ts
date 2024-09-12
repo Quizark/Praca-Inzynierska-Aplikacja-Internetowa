@@ -1,22 +1,25 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
-import { FormBuilder, FormGroup } from '@angular/forms';
+import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { ApiConnectionService } from '../../services/api-connection.service';
 import { UserService } from '../../services/user-service.service';
 import { Task } from '../../interfaces/Task.interface';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-notification-screen',
   templateUrl: './notificationscreen.component.html',
   styleUrls: ['./notificationscreen.component.css'],
+  standalone: true,
+  imports: [ReactiveFormsModule, CommonModule]
 })
 export class NotificationscreenComponent implements OnInit, OnDestroy {
   clientForm: FormGroup;
   tasks: any[] = [];
   filteredTasks: any[] = [];
   searchQuery: string = '';
-  private sessionToken!: string;
+  sessionToken: any;
   private subscriptions: Subscription = new Subscription();
 
   constructor(
@@ -31,7 +34,7 @@ export class NotificationscreenComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
-    const sessionToken = this.userService.getSessionToken();
+    this.sessionToken = this.userService.getSessionToken() || null;
     this.loadTasks();
 
     this.subscriptions.add(
@@ -72,12 +75,13 @@ export class NotificationscreenComponent implements OnInit, OnDestroy {
   }
 
   deleteTask(taskId: string): void {
+    console.log('Deleting taks: ', taskId);
     this.apiService.deleteTask(this.sessionToken, taskId).subscribe(() => {
       this.loadTasks();
     });
   }
 
   goBack(): void {
-    this.router.navigate(['/']);
+   window.history.back();
   }
 }

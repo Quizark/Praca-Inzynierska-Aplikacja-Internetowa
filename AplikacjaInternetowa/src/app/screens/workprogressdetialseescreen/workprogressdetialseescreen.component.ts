@@ -3,33 +3,38 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { UserService } from '../../services/user-service.service';
 import { ApiConnectionService } from '../../services/api-connection.service';
 import { Observable, Subscription } from 'rxjs';
+import { ReactiveFormsModule } from '@angular/forms';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-work-progress-detail-see',
   templateUrl: './workprogressdetialseescreen.component.html',
-  styleUrls: ['./workprogressdetialseescreen.component.css']
+  styleUrls: ['./workprogressdetialseescreen.component.css'],
+  standalone: true,
+  imports: [ReactiveFormsModule, CommonModule],
 })
 export class WorkprogressdetialseescreenComponent implements OnInit, OnDestroy {
   deviceId!: string;
-  sessionToken!: string;
   deviceDetails: any[] = [];
   photos: string[] = [];
   showPhotos = false;
   loading = false;
   photosLoaded = false; // Nowy stan do śledzenia, czy zdjęcia zostały już pobrane
   private routeSub!: Subscription;
-  
+
   constructor(
     private route: ActivatedRoute,
     private router: Router,
     private userService: UserService,
     private apiConnectionService: ApiConnectionService
-  ) {}
+  ) { }
 
   ngOnInit(): void {
-    this.routeSub = this.route.params.subscribe(params => {
+    this.routeSub = this.route.queryParams.subscribe(params => {
       this.deviceId = params['deviceId'];
-      const sessionToken = this.userService.getSessionToken();
+      console.log("deviceId", this.deviceId);
+      console.log("params['deviceId']", params['deviceId']);
+
       this.fetchDeviceDetails();
     });
   }
@@ -41,7 +46,12 @@ export class WorkprogressdetialseescreenComponent implements OnInit, OnDestroy {
   }
 
   fetchDeviceDetails(): void {
-    this.apiConnectionService.fetchDeviceDetails(this.sessionToken, this.deviceId)
+    const sessionToken = this.userService.getSessionToken();
+    if (sessionToken === null) {
+      console.error('Session token is null');
+      return;
+    }
+    this.apiConnectionService.fetchDeviceDetails(sessionToken, this.deviceId)
       .subscribe(details => {
         this.deviceDetails = details;
       });
@@ -49,14 +59,21 @@ export class WorkprogressdetialseescreenComponent implements OnInit, OnDestroy {
 
   fetchPhotos(): void {
     this.loading = true;
-    this.apiConnectionService.fetchDevicePhotos(this.sessionToken, this.deviceId)
+    const sessionToken = this.userService.getSessionToken();
+    if (sessionToken === null) {
+      console.error('Session token is null');
+      return;
+    }
+    this.apiConnectionService.fetchDevicePhotos(sessionToken, this.deviceId)
       .subscribe(
         photos => {
+          console.log('Fetched photos:', photos);  // Logowanie pobranych zdjęć
           this.photos = photos;
           this.photosLoaded = true;
           this.loading = false;
         },
-        () => {
+        error => {
+          console.error('Error fetching photos:', error);
           this.loading = false;
         }
       );
@@ -77,14 +94,11 @@ export class WorkprogressdetialseescreenComponent implements OnInit, OnDestroy {
   }
 
   navigateToUpdate(): void {
-    this.router.navigate(['/work-update', { deviceId: this.deviceId }]);
+    this.router.navigate(['/Workprogressdetialupdatescreen', { deviceId: this.deviceId }]);
   }
 
   goBack(): void {
-    this.router.navigate(['../']);
+    window.history.back();
   }
 
-  viewFullScreen(photoUrl: string): void {
-    this.router.navigate(['/full-screen-image'], { queryParams: { photoUrl } });
-  }
 }

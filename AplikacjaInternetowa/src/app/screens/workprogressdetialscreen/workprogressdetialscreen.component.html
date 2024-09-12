@@ -1,36 +1,26 @@
 <div class="container">
-    <div class="background-image">
-      <form [formGroup]="clientForm">
-        <div class="text-input-container">
-          <input formControlName="clientName" placeholder="Name" class="input" />
-          <input formControlName="clientSurname" placeholder="Surname" class="input" />
-          <input formControlName="clientEmail" type="email" placeholder="Email" class="input" />
-          <input formControlName="clientPhone" type="tel" placeholder="Phone Number" class="input" />
-        </div>
-        
-        <div class="button-container-with-text">
-          <button type="button" class="button" (click)="goBack()">Back</button>
-        </div>
-      </form>
-  
-      <div class="device-scroll-container">
-        <p class="header-device">Client Information:</p>
-        <p class="text-device">{{ personData.name }} {{ personData.surname }}</p>
-        <p class="text-device">{{ deviceData[0]?.email }}</p>
-        <p class="text-device">{{ personData.phone || 'N/A' }}</p>
-  
-        <div *ngFor="let device of deviceData; let i = index" class="task-container">
-          <p class="header-device">Information {{ i + 1 }}:</p>
-          <p class="text-device">Employee: {{ device.employee || 'N/A' }}</p>
-          <p class="text-device">Date of report: {{ device.date }}</p>
-          <p class="text-device">Diagnosis: {{ device.description }}</p>
-          <p class="header-device">Information While Accepting Device:</p>
-          <p class="text-device">Device work: {{ device.deviceWork }}</p>
-          <p class="text-device">Device complete: {{ device.deviceComplete }}</p>
-          <p class="text-device">Visible signs of damage: {{ device.visibleDamage }}</p>
-          <button class="button" (click)="navigateToWorkSee(device.id)">Details</button>
-        </div>
+  <div class="background-image">
+
+    <div class="device-scroll-container">
+      <p class="header-device">Client Information:</p>
+      <p class="text-device">{{ personData.name || 'N/A'}} {{ personData.surname }}</p>
+      <p class="text-device">{{ deviceData[0]?.email }}</p>
+      <p class="text-device">{{ personData.phone || 'N/A' }}</p>
+
+      <div *ngFor="let device of deviceData; let i = index" class="device-container">
+        <p class="header-device">Information {{ i + 1 }}:</p>
+        <p class="text-device">Employee: {{ device.employee || 'N/A' }}</p>
+        <p class="text-device">Date of report: {{ device.date }}</p>
+        <p class="text-device">Diagnosis: {{ device.description }}</p>
+        <p class="header-device">Information While Accepting Device:</p>
+        <p class="text-device">Device work: {{ device.deviceWork }}</p>
+        <p class="text-device">Device complete: {{ device.deviceComplete }}</p>
+        <p class="text-device">Visible signs of damage: {{ device.visibleDamage }}</p>
+        <button class="button" (click)="navigateToWorkSee(device.id)">Details</button>
+      </div>
+      <div class="button-container-with-text">
+        <button type="button" class="button" (click)="goBack()">Back</button>
       </div>
     </div>
   </div>
-  
+</div>

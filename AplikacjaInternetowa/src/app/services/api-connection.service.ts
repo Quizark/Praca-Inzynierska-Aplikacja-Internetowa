@@ -211,7 +211,7 @@ export class ApiConnectionService {
       'Content-Type': 'application/json',
       'Authorization': sessionToken,
     });
-
+    console.log("link", `${this.baseUrl}/persons/email/${email}`);
     return this.http.get(`${this.baseUrl}/persons/email/${email}`, { headers }).pipe(
       catchError(this.handleError)
     );
@@ -242,8 +242,8 @@ export class ApiConnectionService {
   // Tworzenie zadania
   handleTaskSubmit(
     sessionToken: string,
-    selectedDevice: string,
     selectedEmployee: string,
+    selectedDevice: string,
     taskDescription: string
   ) {
     if (!selectedEmployee || !selectedDevice) {
@@ -359,7 +359,7 @@ export class ApiConnectionService {
     });
 
     const updatedData = { name, surname, email, specialization, isAdmin };
-
+    console.log('EmployeeId: ', employeId);
     return this.http.put(`${this.baseUrl}/users/${employeId}`, updatedData, { headers }).pipe(
       catchError(this.handleError)
     );
@@ -409,7 +409,8 @@ export class ApiConnectionService {
       'Authorization': sessionToken,
     });
 
-    return this.http.delete(`${this.baseUrl}/tasks/${taskId}`, { headers }).pipe(
+    return this.http.delete(`${this.baseUrl}/tasks/${taskId}`, { headers, responseType: 'text' }).pipe(
+      map(response => response || {}), // response jest tekstem, ale jeśli nie ma treści, zwróć pusty obiekt
       catchError(this.handleError)
     );
   }
@@ -444,31 +445,34 @@ export class ApiConnectionService {
     const headers = new HttpHeaders({
       'Authorization': sessionToken,
     });
-
+  
     return this.http.get<string[]>(`${this.baseUrl}/upload/photos`, {
       headers,
       params: { deviceCode: deviceId },
     }).pipe(
       catchError(this.handleError),
       mergeMap((fileIds: string[]) => {
-        const photoRequests = fileIds.map(fileId => {
+        // Tworzymy żądania dla każdego pliku
+        const photoRequests: Observable<string>[] = fileIds.map(fileId => {
           return this.http.get(`${this.baseUrl}/upload/files`, {
             headers,
             params: { id: fileId },
             responseType: 'blob',
           }).pipe(
-            map(blob => this.convertBlobToBase64(blob))  // Przekształcanie blob na base64
+            mergeMap(blob => this.convertBlobToBase64(blob)) // Spłaszczamy blob do Base64
           );
         });
-        // Spłaszczenie zagnieżdżonych Observable do jednego Observable<string[]>
-        return forkJoin(photoRequests) as unknown as Observable<string[]>;  // Rzutowanie na Observable<string[]>
+        // Używamy forkJoin, aby połączyć wszystkie strumienie i zwrócić wynik jako Observable<string[]>
+        return forkJoin(photoRequests);  // Tu forkJoin zwróci Observable<string[]>
       })
     );
   }
+  
   private convertBlobToBase64(blob: Blob): Observable<string> {
     return new Observable(observer => {
       const reader = new FileReader();
       reader.onloadend = () => {
+        console.log('Base64 image:', reader.result); // Logowanie base64 zdjęcia
         observer.next(reader.result as string);
         observer.complete();
       };
@@ -490,6 +494,13 @@ export class ApiConnectionService {
     return this.http.post(`${this.baseUrl}/details/add`, data, { headers }).pipe(
       catchError(this.handleError)
     );
+  }
+
+
+  homeFetchNotifications(token: string, email: string): Observable<any[]> {
+    return this.http.get<any[]>(`${this.baseUrl}/tasks/user/${email}/incomplete`, {
+      headers: { Authorization: `${token}` }
+    });
   }
 
 }

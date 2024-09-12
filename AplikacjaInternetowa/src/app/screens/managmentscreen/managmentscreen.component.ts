@@ -8,13 +8,13 @@ import { Router } from '@angular/router';
 })
 export class ManagmentscreenComponent {
 
-  constructor(private router: Router) {}
+  constructor(private router: Router) { }
 
   navigateTo(route: string): void {
     this.router.navigate([route]);
   }
 
   goBack(): void {
-    this.router.navigate(['../']); // Adjust path as needed
+    window.history.back();
   }
 }

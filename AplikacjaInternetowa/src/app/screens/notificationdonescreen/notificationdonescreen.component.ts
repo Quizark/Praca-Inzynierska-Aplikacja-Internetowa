@@ -1,18 +1,21 @@
 import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup } from '@angular/forms';
+import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { ApiConnectionService } from '../../services/api-connection.service';
 import { UserService } from '../../services/user-service.service';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-notification-done-screen',
   templateUrl: './notificationdonescreen.component.html',
-  styleUrls: ['./notificationdonescreen.component.css']
+  styleUrls: ['./notificationdonescreen.component.css'],
+  standalone: true,
+  imports: [ReactiveFormsModule, CommonModule]
 })
 export class NotificationdonescreenComponent implements OnInit {
   tasks: any[] = [];
-  userEmail: string='';
-  sessionToken: string='';
+  userEmail:any;
+  sessionToken:any;
   backgroundImageUrl = './assets/Background.jpg'; // Adjust the path as needed
 
   constructor(
@@ -22,8 +25,8 @@ export class NotificationdonescreenComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    const userEmail = this.userService.getUserEmail();
-    const sessionToken = this.userService.getSessionToken();
+    this.userEmail = this.userService.getUserEmail() || null;
+    this.sessionToken = this.userService.getSessionToken() || null;
     this.fetchTasks();
   }
 
@@ -42,6 +45,6 @@ export class NotificationdonescreenComponent implements OnInit {
   }
 
   goBack(): void {
-    this.router.navigate(['../']);
+    window.history.back();
   }
 }

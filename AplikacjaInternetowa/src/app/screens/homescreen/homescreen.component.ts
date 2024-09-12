@@ -1,7 +1,7 @@
 import { Component, OnInit, AfterViewInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
-import { ApiService } from '../../services/api-service.service';
+import { ApiConnectionService } from '../../services/api-connection.service';
 import { UserService } from '../../services/user-service.service';
 import { trigger, state, style, transition, animate } from '@angular/animations';
 import { Observable, of, Subscription  } from 'rxjs';
@@ -27,7 +27,7 @@ export class HomeComponent implements OnInit, AfterViewInit {
 
   isBrowser: boolean = false;
   userEmail: string = '';
-  sessionToken: string = '';
+  sessionToken: any;
   isAdmin: boolean = false;
   notifications: any[] = [];
   contentWidth: number = 0;
@@ -42,7 +42,7 @@ export class HomeComponent implements OnInit, AfterViewInit {
 
   constructor(
     private router: Router,
-    private apiService: ApiService,
+    private apiService: ApiConnectionService,
     private userService: UserService
   ) {
     this.isBrowser = typeof window !== 'undefined';
@@ -51,12 +51,15 @@ export class HomeComponent implements OnInit, AfterViewInit {
   }
   
   ngOnInit(): void {
+    this.sessionToken = this.userService.getSessionToken() || null;
     this.userEmail$.pipe(
       tap(email => this.userEmail = email || ''),
       switchMap(email => {
         if (email && this.sessionToken) {
           // Return the observable if conditions are met
+          console.log("Pobrano notyfickacje")
           return this.fetchNotifications();
+          
         }
         // Return an empty observable if conditions are not met
         return of([]);
@@ -93,7 +96,7 @@ export class HomeComponent implements OnInit, AfterViewInit {
   }
 
   handleNotificationPress(): void {
-    this.router.navigate(['/notification-done'], { queryParams: { userEmail: this.userEmail } });
+    this.router.navigate(['/Notificationdonescreen'], { queryParams: { userEmail: this.userEmail } });
   }
 
   navigateTo(route: string): void {
