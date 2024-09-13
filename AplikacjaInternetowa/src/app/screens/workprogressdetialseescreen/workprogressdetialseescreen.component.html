@@ -3,16 +3,18 @@
     <div class="scroll-container">
       <!-- Warunkowe renderowanie zdjęcia -->
       <h1 *ngIf="!showPhotos" class="header">Device Details</h1>
-      <div *ngIf="showPhotos"  class="image-container">
+      <div *ngIf="showPhotos" class="horizontal-scroll">
         <img *ngFor="let photo of photos" [src]="photo" alt="Device Photo" class="image" />
       </div>
       <div class="device-scroll-container">
         <!-- Renderowanie informacji o urządzeniu -->
         <ng-container *ngIf="deviceDetails.length; else noInfo">
-          <div *ngFor="let detail of deviceDetails" class="task-container">
-            <p class="text-device">Employee: {{ detail.employee }}</p>
-            <p class="text-device">Date: {{ detail.date }}</p>
-            <p class="text-device">Description: {{ detail.description }}</p>
+          <div *ngFor="let detail of deviceDetails" class="detail-container">
+            <div class="task-container">
+              <p class="text-device">Employee: {{ detail.employee }}</p>
+              <p class="text-device">Date: {{ detail.date }}</p>
+              <p class="text-device">Description: {{ detail.description }}</p>
+            </div>
           </div>
         </ng-container>
         <ng-template #noInfo>
@@ -20,19 +22,7 @@
         </ng-template>
       </div>
     </div>
-    <!-- Renderowanie zdjęć
-    <div *ngIf="showPhotos" class="image-container">
-      <p *ngIf="loading">Loading photos...</p>
-      <ng-container *ngIf="!loading">
-        <ng-container *ngIf="photos.length; else noPhotos">
-          <img *ngFor="let photo of photos" [src]="photo" alt="Device Photo" class="image" />
-        </ng-container>
-        <ng-template #noPhotos>
-          <p class="text-device">No photos for this device</p>
-        </ng-template>
-      </ng-container>
-    </div> -->
-    <div class="button-container">
+    <div class="button-container-row" style="display: flex;">
       <button class="button" (click)="refresh()">Refresh</button>
       <button class="button" (click)="togglePhotos()">
         {{ showPhotos ? "Hide Photos" : "Show Photos" }}

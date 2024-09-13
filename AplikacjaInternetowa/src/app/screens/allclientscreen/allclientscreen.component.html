@@ -4,10 +4,10 @@
             <input formControlName="searchQuery" placeholder="Search clients..." class="input" />
         </form>
 
-        <div class="scroll-container">
+        <div class="big-scroll-container">
             <div *ngIf="loading">Loading clients...</div>
             <div *ngIf="!loading && filteredClients.length > 0">
-                <div *ngFor="let client of filteredClients" class="task-container">
+                <div *ngFor="let client of filteredClients" class="client-container">
                     <div class="client-info">
                         <p>Name: {{ client.name }} {{ client.surname }}</p>
                         <p>Email: {{ client.email }}</p>
@@ -19,7 +19,7 @@
             <div *ngIf="!loading && filteredClients.length === 0">No clients found</div>
         </div>
 
-        <div class="button-container-inline">
+        <div class="button-container">
             <button class="button" (click)="refreshClients()">Refresh</button>
             <button class="button" (click)="goBack()">Back</button>
         </div>
