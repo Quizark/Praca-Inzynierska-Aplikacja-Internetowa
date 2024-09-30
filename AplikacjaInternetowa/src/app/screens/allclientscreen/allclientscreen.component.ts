@@ -40,8 +40,6 @@ export class AllclientscreenComponent implements OnInit, OnDestroy {
         this.filteredClients = this.filterClients(query);
       })
     );
-
-    
   }
 
   ngOnDestroy(): void {

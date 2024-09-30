@@ -112,21 +112,24 @@ export class ApiConnectionService {
     };
 
     let link = `${this.baseUrl}/devices/create`;
-    console.log("isCodeAssigned should be true/false: ", isCodeAssigned);
+    //console.log("isCodeAssigned should be true/false: ", isCodeAssigned);
     if (!isCodeAssigned) {
       link = `${this.baseUrl}/devices/createNew`;
-      console.log("isCodeAssigned should be false: ", isCodeAssigned);
+      //console.log("isCodeAssigned should be false: ", isCodeAssigned);
     }
 
     const headers = new HttpHeaders({
       'Content-Type': 'application/json',
       'Authorization': sessionToken,
     });
-    console.log("Sending data: ", reportDataWithDate);
-    console.log("Sending link: ", link);
+    //console.log("Sending data: ", reportDataWithDate);
+    //console.log("Sending link: ", link);
     return this.http.post(link, reportDataWithDate, { headers }).pipe(
-      tap((response) => {
-        console.log('Response from server: ', response);
+      tap((response: any) => {
+        //console.log('Response from server: ', response);
+        if (response && response.Device && response.Device.codeNumber) {
+          alert(`Device code number: ${response.Device.codeNumber}`);
+        }
       }),
       catchError(this.handleError)
     );
