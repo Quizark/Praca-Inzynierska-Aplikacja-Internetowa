@@ -19,10 +19,15 @@ import { NotificationscreenComponent } from './screens/notificationscreen/notifi
 import { WorkprogressdetialseescreenComponent } from './screens/workprogressdetialseescreen/workprogressdetialseescreen.component';
 import { WorkprogressdetialupdatescreenComponent } from './screens/workprogressdetialupdatescreen/workprogressdetialupdatescreen.component';
 import { WorkprogressdetialscreenComponent } from './screens/workprogressdetialscreen/workprogressdetialscreen.component';
+import { FirstcomponentComponent } from './screens/firstcomponent/firstcomponent.component';
+import { SearchForClientComponent } from './screens/search-for-client/search-for-client.component';
+import { ClientFinalScreenComponent } from './screens/client-final-screen/client-final-screen.component';
 
 export const routes: Routes = [
   { path: 'home', component: HomeComponent, canActivate: [AuthGuard] },
-  { path: '', redirectTo: 'login', pathMatch: 'full' },
+  { path: '', component: FirstcomponentComponent},
+  { path: 'ClientFinalScreen', component: ClientFinalScreenComponent},
+  { path: 'SearchForClient', component: SearchForClientComponent},
   { path: 'login', component: LoginScreenComponent },
   { path: 'register', component: RegisterscreenComponent}, 
   { path: 'addnewclientscreen', component: AddnewclientscreenComponent, canActivate: [AuthGuard]},

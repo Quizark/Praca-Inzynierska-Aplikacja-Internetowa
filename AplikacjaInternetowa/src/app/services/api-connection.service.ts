@@ -506,4 +506,11 @@ export class ApiConnectionService {
     });
   }
 
+  getDeviceWithDetails(codeNumber: string, email: string, sessionToken: string): Observable<any> {
+    const headers = new HttpHeaders({
+      'Authorization': `Bearer ${sessionToken}` // Dodaj token autoryzacyjny, jeśli wymagany
+    });
+
+    return this.http.get<any>(`${this.baseUrl}/devices/deviceWithDetails?codeNumber=${codeNumber}&email=${email}`, { headers });
+  }
 }
