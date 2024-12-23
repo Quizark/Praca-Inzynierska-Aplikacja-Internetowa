@@ -17,7 +17,8 @@ export class EditemployeescreenComponent implements OnInit {
   isAdmin: boolean = false;
   employeeId: string = '';
   sessionToken: string = '';
-  employee: any;
+  employee: any = {};
+  isActive: boolean = false;
 
   constructor(
     private fb: FormBuilder,
@@ -28,52 +29,61 @@ export class EditemployeescreenComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    //console.log("ngOnInitStart");
+    this.sessionToken = this.userService.getSessionToken() || '';
 
-    const sessionToken = this.userService.getSessionToken();
-    this.sessionToken = sessionToken || ''; // Initialize sessionToken
-    
-    this.employee = history.state.employee;
-    //console.log('Employee data:', this.employee);
-  
+    // Pobranie danych pracownika z przekazanych parametrów lub historii stanu
+    this.route.params.subscribe(params => {
+      this.employeeId = params['id'] || '';
+    });
+    this.employee = history.state.employee || {};
+
     this.employeeForm = this.fb.group({
-      name: ['', Validators.required],
-      surname: ['', Validators.required],
-      email: ['', [Validators.required, Validators.email]],
-      specialization: ['']
+      name: [this.employee.name || '', Validators.required],
+      surname: [this.employee.surname || '', Validators.required],
+      email: [this.employee.email || '', [Validators.required, Validators.email]],
+      specialization: [this.employee.specialization || '']
     });
-    //console.log("ngOnInitEnd");
-    this.initializeForm(this.employee);
-  }
 
-  initializeForm(employee: any): void {
-    this.employeeForm.patchValue({
-      name: employee.name,
-      surname: employee.surname,
-      email: employee.email,
-      specialization: employee.specialization
-    });
-    this.isAdmin = employee.isAdmin || false; // Set the admin flag if available
+    this.isAdmin = this.employee.isAdmin || false;
+    this.isActive = this.employee.isActive || false;
   }
 
   handleToggleAdmin(): void {
-    this.apiService.toggleAdmin(this.sessionToken, this.employee.id, this.employeeForm.value.name, this.employeeForm.value.surname, this.employeeForm.value.email, this.employeeForm.value.specialization, this.isAdmin).subscribe(() => {
+    this.apiService.toggleAdmin(this.sessionToken, this.employee.id, this.employeeForm.value.name, this.employeeForm.value.surname, this.employeeForm.value.email, this.employeeForm.value.specialization, this.isAdmin, this.isActive).subscribe(() => {
       this.isAdmin = !this.isAdmin;
     });
+    console.log(this.isAdmin);
+  }
+
+  handleToggleActive(): void {
+    this.apiService.toggleActive(this.sessionToken, this.employee.id, this.employeeForm.value.name, this.employeeForm.value.surname, this.employeeForm.value.email, this.employeeForm.value.specialization, this.isAdmin, this.isActive).subscribe(() => {
+      this.isActive = !this.isActive;
+    });
+    console.log(this.isActive);
   }
 
   handleSave(): void {
-    //console.log('EmployeeId before send: ', this.employee.id);
-    //console.log("all: ",this.sessionToken, this.employee.id, this.employeeForm.value.name, this.employeeForm.value.surname, this.employeeForm.value.email, this.employeeForm.value.specialization, this.isAdmin)
-    this.apiService.saveEmployee(this.sessionToken, this.employee.id, this.employeeForm.value.name, this.employeeForm.value.surname, this.employeeForm.value.email, this.employeeForm.value.specialization, this.isAdmin).subscribe(() => {
+      this.apiService.saveEmployee(this.sessionToken, this.employee.id, this.employeeForm.value.name, this.employeeForm.value.surname, this.employeeForm.value.email, this.employeeForm.value.specialization, this.isAdmin, this.isActive).subscribe(() => {
       this.goBack();
     });
   }
+
+
 
   handleDelete(): void {
     this.apiService.deleteEmployee(this.sessionToken, this.employeeId).subscribe(() => {
       this.goBack();
     });
+  }
+
+  prepareEmployeeData(): any {
+    return {
+      name: this.employeeForm.value.name,
+      surname: this.employeeForm.value.surname,
+      email: this.employeeForm.value.email,
+      specialization: this.employeeForm.value.specialization,
+      isAdmin: this.isAdmin
+    };
   }
 
   goBack(): void {

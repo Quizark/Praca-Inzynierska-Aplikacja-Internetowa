@@ -6,4 +6,5 @@ export interface Employee {
     surname: string;
     specialization: string;
     isAdmin: boolean;
+    isActive: boolean;
   }

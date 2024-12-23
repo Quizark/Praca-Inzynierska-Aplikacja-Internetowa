@@ -311,6 +311,7 @@ export class ApiConnectionService {
       catchError(this.handleError)
     );
   }
+
   // Zmiana uprawnień administratora
   toggleAdmin(
     sessionToken: string,
@@ -319,22 +320,45 @@ export class ApiConnectionService {
     surname: string,
     email: string,
     specialization: string,
-    isAdmin: boolean
+    isAdmin: boolean,
+    isActive: boolean,
   ) {
     const newIsAdmin = !isAdmin;
-    const updatedData = { name, surname, email, specialization, isAdmin: newIsAdmin };
+    const updatedData = { name, surname, email, specialization, isAdmin: newIsAdmin, isActive };
 
     const headers = new HttpHeaders({
       'Content-Type': 'application/json',
       'Authorization': sessionToken,
     });
-
+    console.log('Admin:', `${this.baseUrl}/users/${employeId}`, updatedData, { headers })
     return this.http.put(`${this.baseUrl}/users/${employeId}`, updatedData, { headers }).pipe(
       catchError(this.handleError)
     );
   }
 
+  // Przełączanie aktywności pracownika
+  toggleActive(
+    sessionToken: string,
+    employeId: string,
+    name: string,
+    surname: string,
+    email: string,
+    specialization: string,
+    isAdmin: boolean,
+    isActive: boolean,
+  ) {
+    const newIsActive = !isActive;
+    const updatedData = { name, surname, email, specialization, isAdmin, isActive: newIsActive };
 
+    const headers = new HttpHeaders({
+      'Content-Type': 'application/json',
+      'Authorization': sessionToken,
+    });
+    console.log('Active:', `${this.baseUrl}/users/${employeId}`, updatedData, { headers })
+    return this.http.put(`${this.baseUrl}/users/${employeId}`, updatedData, { headers }).pipe(
+      catchError(this.handleError)
+    );
+  }
   // Usunięcie pracownika
   deleteEmployee(sessionToken: string, employeId: string) {
     const headers = new HttpHeaders({
@@ -346,27 +370,29 @@ export class ApiConnectionService {
     );
   }
 
-  // Aktualizacja pracownika
-  saveEmployee(
+   // Aktualizacja pracownika
+   saveEmployee(
     sessionToken: string,
     employeId: string,
     name: string,
     surname: string,
     email: string,
     specialization: string,
-    isAdmin: boolean
+    isAdmin: boolean,
+    isActive: boolean,
   ) {
     const headers = new HttpHeaders({
       'Content-Type': 'application/json',
       'Authorization': sessionToken,
     });
 
-    const updatedData = { name, surname, email, specialization, isAdmin };
+    const updatedData = { name, surname, email, specialization, isAdmin, isActive };
     console.log('EmployeeId: ', employeId);
     return this.http.put(`${this.baseUrl}/users/${employeId}`, updatedData, { headers }).pipe(
       catchError(this.handleError)
     );
   }
+
 
   // Pobieranie powiadomień
   fetchNotifications(sessionToken: string, userEmail: string) {
@@ -448,7 +474,7 @@ export class ApiConnectionService {
     const headers = new HttpHeaders({
       'Authorization': sessionToken,
     });
-  
+
     return this.http.get<string[]>(`${this.baseUrl}/upload/photos`, {
       headers,
       params: { deviceCode: deviceId },
@@ -470,7 +496,7 @@ export class ApiConnectionService {
       })
     );
   }
-  
+
   private convertBlobToBase64(blob: Blob): Observable<string> {
     return new Observable(observer => {
       const reader = new FileReader();

@@ -12,6 +12,10 @@
                     (click)="handleToggleAdmin()">
                     {{ isAdmin ? 'Set as Not Admin' : 'Set as Admin' }}
                 </button>
+                <button type="button" [ngClass]="{'red-button': isActive, 'green-button': !isActive}"
+                    (click)="handleToggleActive()">
+                    {{ isActive ? 'Set as Not Active' : 'Set as Active' }}
+                </button>
                 <button type="submit" class="green-button">Save</button>
                 <button type="button" class="red-button" (click)="handleDelete()">Delete Employee</button>
                 <button type="button" class="button" (click)="goBack()">Back</button>
