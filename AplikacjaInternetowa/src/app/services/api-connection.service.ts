@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { catchError, forkJoin, map, mergeMap, Observable, tap, throwError } from 'rxjs';
 import * as CryptoJS from 'crypto-js';
 import { Employee } from '../interfaces/Employee.interface';
@@ -11,7 +11,9 @@ import { Task } from '../interfaces/Task.interface';
   providedIn: 'root',
 })
 export class ApiConnectionService {
+
   private baseUrl = 'http://localhost:8080';
+  httpClient: any;
 
   constructor(private http: HttpClient) { }
 
@@ -370,8 +372,8 @@ export class ApiConnectionService {
     );
   }
 
-   // Aktualizacja pracownika
-   saveEmployee(
+  // Aktualizacja pracownika
+  saveEmployee(
     sessionToken: string,
     employeId: string,
     name: string,
@@ -534,9 +536,14 @@ export class ApiConnectionService {
 
   getDeviceWithDetails(codeNumber: string, email: string, sessionToken: string): Observable<any> {
     const headers = new HttpHeaders({
-      'Authorization': `Bearer ${sessionToken}` // Dodaj token autoryzacyjny, jeśli wymagany
+      'Authorization':  sessionToken // Dodaj token autoryzacyjny, jeśli wymagany
     });
 
     return this.http.get<any>(`${this.baseUrl}/devices/deviceWithDetails?codeNumber=${codeNumber}&email=${email}`, { headers });
   }
+
+  createDeleteUserTask(email: string) {
+    return this.http.get(`${this.baseUrl}/tasks/create-delete-user-task?userEmail=${email}`, { responseType: 'text' });
+  }
+
 }

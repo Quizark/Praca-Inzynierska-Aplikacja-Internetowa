@@ -15,6 +15,7 @@ import { ApiConnectionService } from '../../services/api-connection.service';
 })
 export class LoginScreenComponent implements OnInit {
 
+
   loginForm: FormGroup;
 
   constructor(
@@ -82,5 +83,22 @@ export class LoginScreenComponent implements OnInit {
 
   navigateToRegister(): void {
     this.router.navigate(['/register']);
+  }
+  createRestartUserTask(email: string | null): void {
+    if (!email) {
+      this.snackBar.open('Please provide a valid email address.', 'Close', { duration: 3000 });
+      return;
+    }
+
+    this.apiConnection.createDeleteUserTask(email).subscribe({
+      next: (response: string) => {
+        console.log('Response:', response);
+        this.snackBar.open(response, 'Close', { duration: 3000 });
+      },
+      error: (error: any) => {
+        console.error('Error creating delete user task:', error);
+        this.snackBar.open('Failed to create delete user task. Please try again.', 'Close', { duration: 5000 });
+      },
+    });
   }
 }
