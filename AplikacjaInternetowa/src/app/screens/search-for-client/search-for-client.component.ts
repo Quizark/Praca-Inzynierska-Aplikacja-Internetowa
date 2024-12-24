@@ -9,9 +9,7 @@ import { Router } from '@angular/router';
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule],
   templateUrl: './search-for-client.component.html',
-  styleUrl: './search-for-client.component.css',
-  encapsulation: ViewEncapsulation.ShadowDom
-})
+  styleUrl: './search-for-client.component.css'})
 export class SearchForClientComponent {
   searchForm: FormGroup;
   

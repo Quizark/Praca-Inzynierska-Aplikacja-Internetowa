@@ -64,9 +64,9 @@ export class NotificationscreenComponent implements OnInit, OnDestroy {
   handleSearch(query: string): void {
     if (query) {
       this.filteredTasks = this.tasks.filter(task =>
-        task.deviceCodeNumber.toLowerCase().includes(query.toLowerCase()) ||
-        task.taskDescription.toLowerCase().includes(query.toLowerCase()) ||
-        task.employeeEmail.toLowerCase().includes(query.toLowerCase()) ||
+        (task.deviceCodeNumber?.toLowerCase() || '').includes(query.toLowerCase()) ||
+        (task.taskDescription?.toLowerCase() || '').includes(query.toLowerCase()) ||
+        (task.employeeEmail?.toLowerCase() || '').includes(query.toLowerCase()) ||
         (task.isDone ? 'true' : 'false').includes(query.toLowerCase())
       );
     } else {

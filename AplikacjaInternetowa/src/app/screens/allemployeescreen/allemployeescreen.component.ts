@@ -68,7 +68,8 @@ export class AllemployeescreenComponent implements OnInit, OnDestroy {
     return this.employees.filter(employee =>
       employee.name.toLowerCase().includes(lowerQuery) ||
       employee.surname.toLowerCase().includes(lowerQuery) ||
-      employee.email.toLowerCase().includes(lowerQuery)
+      employee.email.toLowerCase().includes(lowerQuery) ||
+      employee.specialization.toLowerCase().includes(lowerQuery)
     );
   }
 
