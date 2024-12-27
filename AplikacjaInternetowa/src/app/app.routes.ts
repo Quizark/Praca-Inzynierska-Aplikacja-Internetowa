@@ -22,6 +22,7 @@ import { WorkprogressdetialscreenComponent } from './screens/workprogressdetials
 import { FirstcomponentComponent } from './screens/firstcomponent/firstcomponent.component';
 import { SearchForClientComponent } from './screens/search-for-client/search-for-client.component';
 import { ClientFinalScreenComponent } from './screens/client-final-screen/client-final-screen.component';
+import { CreateEndingRaportComponent } from './screens/create-ending-raport/create-ending-raport.component';
 
 export const routes: Routes = [
   { path: 'home', component: HomeComponent, canActivate: [AuthGuard] },
@@ -45,7 +46,8 @@ export const routes: Routes = [
   { path: 'Workprogressdetialseescreen', component: WorkprogressdetialseescreenComponent, canActivate: [AuthGuard]},
   { path: 'Workprogressdetialupdatescreen', component: WorkprogressdetialupdatescreenComponent, canActivate: [AuthGuard]},
   { path: 'Workprogressdetailscreen', component: WorkprogressdetialscreenComponent, canActivate: [AuthGuard]},
-  
+  { path: 'CreateEndingRaportScreen', component: CreateEndingRaportComponent, canActivate: [AuthGuard]},
+
   // inne ścieżki
 ];
 

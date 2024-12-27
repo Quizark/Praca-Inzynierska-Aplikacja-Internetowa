@@ -546,4 +546,20 @@ export class ApiConnectionService {
     return this.http.get(`${this.baseUrl}/tasks/create-delete-user-task?userEmail=${email}`, { responseType: 'text' });
   }
 
+  createEndingRaport(sessionToken: string, id: string): Observable<Blob> {
+    const headers = new HttpHeaders({
+      'Authorization': `${sessionToken}`
+    });
+
+    const params = {
+      id: id,
+    };
+
+    return this.http.get(`${this.baseUrl}/devices/generatePdf`, {
+      params: params,
+      headers: headers,
+      responseType: 'blob'
+    });
+  }
+
 }
