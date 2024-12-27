@@ -1,18 +1,25 @@
 <div class="container">
-    <form [formGroup]="endingRaportForm" (ngSubmit)="createEndingRaport()">
-      <mat-form-field appearance="fill">
-        <mat-label>Select Device</mat-label>
-        <mat-select formControlName="selectedDevice">
-          <mat-option *ngFor="let device of devices" [value]="device.id">
-            Device Number: {{ device.codeNumber }} | Device description: {{ device.description }}
-          </mat-option>
-        </mat-select>
-      </mat-form-field>
-  
-      <button class="button" type="submit">Create Raport</button>
-      <button class="button" (click)="updateDevice()">Update Device Raport</button>
-      <button class="button" (click)="addNewPhotos()">Add New Photos for Device</button>
+  <div class="background-image">
+    <form [formGroup]="endingRaportForm">
+      <div class="text-input-container">
+        <label for="device">Choose a device:</label>
+        <mat-form-field appearance="fill">
+          <mat-label>Device</mat-label>
+          <mat-select formControlName="selectedDevice" placeholder="Select a device">
+            <mat-option *ngFor="let device of devices.slice().reverse()" [value]="device.id">
+              Device Number: {{ device.codeNumber }} | Device description: {{ device.description }}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+        <p>Selected Device: {{ selectedDeviceCode }}</p>
+      </div>
 
+      <div class="button-container-with-text">
+        <button class="button" (click)="createEndingRaport()">Create Raport</button>
+        <button class="button" (click)="updateDevice()">Update Device Raport</button>
+        <button class="button" (click)="addNewPhotos()">Add New Photos for Device</button>
+        <button type="button" class="button" (click)="goBack()">Back</button>
+      </div>
     </form>
   </div>
-  
+</div>

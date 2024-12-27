@@ -92,33 +92,39 @@ export class CreateEndingRaportComponent implements OnInit {
     this.router.navigate(['/Addreportphotosscreen'], { state: { reportData } });
   }
 
+  
+
   createEndingRaport() {
+
     if (!this.selectedDeviceCode || this.selectedDeviceCode === 'None') {
       console.error('No device selected for adding photos.');
+    
       return;
-    } else {
-      const selectedDevice = this.devices.find(device => device.codeNumber === this.selectedDeviceCode);
-
-      if (!selectedDevice) {
-        console.error('Selected device not found in the device list.');
-        return;
-      }
-      
-      this.apiService.createEndingRaport(this.sessionToken, selectedDevice.id).subscribe({
-        next: (data: Blob) => {
-          // Przetwarzanie odpowiedzi, np. pobieranie pliku PDF
-          const blob = new Blob([data], { type: 'application/pdf' });
-          const url = window.URL.createObjectURL(blob);
-          const a = document.createElement('a');
-          a.href = url;
-          a.download = 'ending-raport.pdf'; // Nazwa pliku PDF
-          a.click();
-          window.URL.revokeObjectURL(url);
-        },
-        error: (err) => {
-          console.error('Error fetching report:', err);
-        }
-      });
     }
+
+    const selectedDevice = this.devices.find(device => device.codeNumber === this.selectedDeviceCode);
+    if (!selectedDevice) {
+      console.error('Selected device not found in the device list.');
+      return;
+    }
+
+    this.apiService.createEndingRaport(this.sessionToken, selectedDevice.id).subscribe({
+      next: (data: Blob) => {
+        const blob = new Blob([data], { type: 'application/pdf' });
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'ending-raport.pdf'; // Nazwa pliku PDF
+        a.click();
+        window.URL.revokeObjectURL(url);
+      },
+      error: (err) => {
+        console.error('Error fetching report:', err);
+      }
+    });
+  }
+
+  goBack(): void {
+    window.history.back();
   }
 }
