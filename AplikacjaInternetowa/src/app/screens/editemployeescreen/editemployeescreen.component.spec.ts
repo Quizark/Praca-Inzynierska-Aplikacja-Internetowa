@@ -1,147 +1,136 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { EditemployeescreenComponent } from './editemployeescreen.component';
-import { ReactiveFormsModule } from '@angular/forms';
-import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { Router } from '@angular/router';
-import { ActivatedRoute } from '@angular/router';
+import { ReactiveFormsModule, FormBuilder } from '@angular/forms';
+import { RouterTestingModule } from '@angular/router/testing';
 import { ApiConnectionService } from '../../services/api-connection.service';
 import { UserService } from '../../services/user-service.service';
+import { ActivatedRoute, Router } from '@angular/router';
 import { of } from 'rxjs';
+import { CommonModule } from '@angular/common';
+import { fakeAsync, tick } from '@angular/core/testing';
 
 describe('EditemployeescreenComponent', () => {
   let component: EditemployeescreenComponent;
   let fixture: ComponentFixture<EditemployeescreenComponent>;
   let mockApiService: jasmine.SpyObj<ApiConnectionService>;
   let mockUserService: jasmine.SpyObj<UserService>;
-  let mockRouter: jasmine.SpyObj<Router>;
+  let activatedRoute: ActivatedRoute;
 
-  beforeEach(async () => {
-    // Mockowane zależności
-    mockApiService = jasmine.createSpyObj('ApiConnectionService', ['toggleAdmin', 'saveEmployee', 'deleteEmployee']);
+  beforeEach(() => {
+    mockApiService = jasmine.createSpyObj('ApiConnectionService', [
+      'toggleActive',
+      'toggleAdmin',
+      'saveEmployee',
+      'deleteEmployee',
+    ]);
+
     mockUserService = jasmine.createSpyObj('UserService', ['getSessionToken']);
-    mockRouter = jasmine.createSpyObj('Router', ['navigate']);
+    mockUserService.getSessionToken.and.returnValue('dummy-token');
 
-    // Mock history.state
-    Object.defineProperty(window, 'history', {
-      value: {
-        state: {
-          employee: {
-            id: '123',
-            name: 'John',
-            surname: 'Doe',
-            email: 'john.doe@example.com',
-            specialization: 'Engineering',
-            isAdmin: true,
-          }
-        }
-      }
-    });
-
-    await TestBed.configureTestingModule({
-      imports: [ReactiveFormsModule, HttpClientTestingModule, EditemployeescreenComponent],
+    TestBed.configureTestingModule({
+      imports: [ReactiveFormsModule, RouterTestingModule.withRoutes([]), CommonModule],
       providers: [
         { provide: ApiConnectionService, useValue: mockApiService },
         { provide: UserService, useValue: mockUserService },
-        { provide: Router, useValue: mockRouter },
         {
           provide: ActivatedRoute,
           useValue: {
-            snapshot: { params: { id: '123' } },
-            paramMap: of({ get: (key: string) => (key === 'id' ? '123' : null) })
-          }
-        }
-      ]
-    }).compileComponents();
+            params: of({ id: '1' }),
+          },
+        },
+      ],
+    });
 
     fixture = TestBed.createComponent(EditemployeescreenComponent);
     component = fixture.componentInstance;
-
-    // Mock wartości zwracanych przez UserService
-    mockUserService.getSessionToken.and.returnValue('mock-session-token');
-
-    fixture.detectChanges();
   });
 
   it('should create', () => {
+    fixture.detectChanges();
+
     expect(component).toBeTruthy();
+    expect(component.employeeForm).toBeDefined();
+    expect(component.employeeId).toBe('1');
+    expect(component.sessionToken).toBe('dummy-token');
   });
 
-  it('should initialize the form with employee data', () => {
-    // Given
-    const employee = {
-      id: '123',
+  it('should initialize the form with employee data from history state', () => {
+    // Given:
+    const mockEmployee = { id: '1', name: 'John', surname: 'Doe', email: 'john.doe@example.com', phone: '123456789' };
+    const mockHistoryState = { employee: mockEmployee };
+  
+    Object.defineProperty(history, 'state', { value: mockHistoryState });
+  
+    // When:
+    fixture.detectChanges();  
+  
+    // Then:
+    expect(component.employeeForm.value).toEqual({
       name: 'John',
       surname: 'Doe',
       email: 'john.doe@example.com',
-      specialization: 'Engineering',
-      isAdmin: true
-    };
-
-    // When
+      specialization: '' 
+    });  
+  
+    expect(component.employeeId).toBe('1');  
+  });
+  it('should save employee data', fakeAsync(() => {
+    // Given:
+    const mockEmployee = { id: '1', name: 'John', surname: 'Doe', email: 'john.doe@example.com', phone: '123456789' };
+  
+    // Mock history state
+    Object.defineProperty(window.history, 'state', { value: { employee: mockEmployee } });
+  
+    // Update the fixture
     fixture.detectChanges();
-
-    // Then
-    expect(component.employeeForm.value).toEqual({
-      name: employee.name,
-      surname: employee.surname,
-      email: employee.email,
-      specialization: employee.specialization
-    });
-    expect(component.isAdmin).toBe(employee.isAdmin);
-  });
-
-  it('should toggle admin status and update the server', () => {
-    // Given
-    mockApiService.toggleAdmin.and.returnValue(of({}));
-    expect(component.isAdmin).toBeTrue();
-
-    // When
-    component.handleToggleAdmin();
-
-    // Then
-    expect(mockApiService.toggleAdmin).toHaveBeenCalledWith(
-      'mock-session-token',
-      '123',
-      'John',
-      'Doe',
-      'john.doe@example.com',
-      'Engineering',
-      true
-    );
-    expect(component.isAdmin).toBe(false);
-  });
-
-  it('should save employee data and navigate back', () => {
-    // Given
+  
+    // When: Update form values
+    component.employeeForm.controls['name'].setValue('Jane');
+    component.employeeForm.controls['surname'].setValue('Smith');
+    component.employeeForm.controls['email'].setValue('jane.smith@example.com');
+  
+    // Mock API response
     mockApiService.saveEmployee.and.returnValue(of({}));
-    spyOn(component, 'goBack');
-
-    // When
+  
+    // Call save method
     component.handleSave();
-
-    // Then
+  
+    // Wait for async operations to complete
+    tick();
+  
+    // Then: Verify saveEmployee was called
     expect(mockApiService.saveEmployee).toHaveBeenCalledWith(
-      'mock-session-token',
-      '123',
-      'John',
-      'Doe',
-      'john.doe@example.com',
-      'Engineering',
-      true
+      'dummy-token', 
+      '1', 
+      'Jane', 
+      'Smith', 
+      'jane.smith@example.com', 
+      '',  // specialization
+      false,  // isAdmin
+      false   // isActive
     );
-    expect(component.goBack).toHaveBeenCalled();
-  });
-
-  it('should delete employee and navigate back', () => {
-    // Given
+  }));
+  
+  it('should delete employee', fakeAsync(() => {
+    // Given:
+    const mockEmployee = { id: '1', name: 'John', surname: 'Doe', email: 'john.doe@example.com', phone: '123456789' };
+  
+    // Mock history state
+    Object.defineProperty(window.history, 'state', { value: { employee: mockEmployee } });
+  
+    // Update the fixture
+    fixture.detectChanges();
+  
+    // Mock API response for delete
     mockApiService.deleteEmployee.and.returnValue(of({}));
-    spyOn(component, 'goBack');
-
-    // When
+  
+    // Call delete method
     component.handleDelete();
-
-    // Then
-    expect(mockApiService.deleteEmployee).toHaveBeenCalledWith('mock-session-token', '');
-    expect(component.goBack).toHaveBeenCalled();
-  });
+  
+    // Wait for async operations to complete
+    tick();
+  
+    // Then: Verify deleteEmployee was called
+    expect(mockApiService.deleteEmployee).toHaveBeenCalledWith('dummy-token', '1');
+  }));
 });

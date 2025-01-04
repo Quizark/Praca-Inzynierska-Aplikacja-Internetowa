@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { ReactiveFormsModule,FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { ApiConnectionService } from '../../services/api-connection.service'; // Replace with your actual path
 import { UserService } from '../../services/user-service.service'; // Replace with your actual path
@@ -14,7 +14,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 export class AddnewclientscreenComponent {
   clientForm: FormGroup;
   sessionToken: string | null = null; // Initialize to null
-  
+
   constructor(
     private fb: FormBuilder,
     private router: Router,
@@ -23,10 +23,13 @@ export class AddnewclientscreenComponent {
     private snackBar: MatSnackBar
   ) {
     this.clientForm = this.fb.group({
-      clientName: ['', Validators.required],
-      clientSurname: ['', Validators.required],
-      clientEmail: ['', [Validators.required, Validators.email]],
-      clientPhone: ['', Validators.required]
+      clientName: ['', [Validators.required, Validators.minLength(3)]], 
+      clientSurname: ['', [Validators.required, Validators.minLength(3)]], 
+      clientEmail: ['', [Validators.required, Validators.email]], 
+      clientPhone: ['', [
+        Validators.required,
+        Validators.pattern('^[0-9]{9}$') 
+      ]]
     });
 
     this.userService.sessionToken$.subscribe(token => this.sessionToken = token);

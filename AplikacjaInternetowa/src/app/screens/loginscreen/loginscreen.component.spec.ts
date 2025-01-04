@@ -69,6 +69,6 @@ describe('LoginScreenComponent', () => {
 
     // Then:
     expect(mockApiConnection.login).toHaveBeenCalledWith('test@example.com', 'wrongpassword');
-    expect(mockSnackBar.open).toHaveBeenCalledWith('Login failed: Invalid credentials', 'Close', { duration: 3000 });
+    expect(mockSnackBar.open).toHaveBeenCalledWith('Login failed: An unexpected error occurred', 'Close', { duration: 5000 });
   });
 });

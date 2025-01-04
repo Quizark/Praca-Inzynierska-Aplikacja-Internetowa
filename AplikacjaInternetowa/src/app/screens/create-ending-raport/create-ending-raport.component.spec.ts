@@ -1,5 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations'; 
+import { HttpClientModule } from '@angular/common/http'; 
 import { CreateEndingRaportComponent } from './create-ending-raport.component';
 
 describe('CreateEndingRaportComponent', () => {
@@ -8,7 +9,7 @@ describe('CreateEndingRaportComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [CreateEndingRaportComponent]
+      imports: [BrowserAnimationsModule, HttpClientModule, CreateEndingRaportComponent] 
     })
     .compileComponents();
 
